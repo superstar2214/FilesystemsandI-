@@ -107,6 +107,42 @@ public class TestProcessBuilder {
         }
     }
 
+    private static void copyFile(String sourceFile, String destinationFile) {
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+
+        try {
+            // Create a buffered reader to read the source file
+            reader = new BufferedReader(new FileReader(sourceFile));
+            // Create a buffered writer to write to the destination file
+            writer = new BufferedWriter(new FileWriter(destinationFile));
+
+            String line;
+            // Read from source file and write to destination file line by line
+            while ((line = reader.readLine()) != null) {
+                writer.write(line);
+                writer.newLine(); // Write a new line to preserve the line breaks
+            }
+        } catch (FileNotFoundException e) {
+            // Handle file not found error by logging the command and printing an error message
+            logErrorCommand("copyfile " + sourceFile + " " + destinationFile);
+            System.err.println("Error: Source file not found - " + sourceFile);
+        } catch (IOException e) {
+            // Handle IO error by logging the command and printing an error message
+            logErrorCommand("copyfile " + sourceFile + " " + destinationFile);
+            System.err.println("Error copying file - from " + sourceFile + " to " + destinationFile);
+        } finally {
+            // Close the readers and writers when done
+            try {
+                if (reader != null) reader.close();
+                if (writer != null) writer.close();
+            } catch (IOException e) {
+                // Ignored
+            }
+        }
+    }
+
+
 
     // Method to create and run a process
     public static void createProcess(String command) {
@@ -126,7 +162,19 @@ public class TestProcessBuilder {
             // If the command is "filedump," call the fileDump method with the filename parameter
             String filename = command.substring("filedump ".length());
             fileDump(filename);
-        } else {
+        }
+        else if (command.toLowerCase().startsWith("copyfile ")) {
+            // If the command is "copyfile," parse the filenames and call the copyFile method
+            String[] parts = command.split(" ");
+            if (parts.length == 3) {
+                String sourceFile = parts[1];
+                String destinationFile = parts[2];
+                copyFile(sourceFile, destinationFile);
+            } else {
+                System.err.println("Error: Invalid syntax for copyfile command. Use: copyfile <sourceFile> <destinationFile>");
+            }
+        }
+        else {
             // If not an internal command, try running it in a separate thread
             Thread processThread = new Thread(new ProcessRunner(command));
             processThread.start();
