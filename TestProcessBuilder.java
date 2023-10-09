@@ -142,6 +142,41 @@ public class TestProcessBuilder {
         }
     }
 
+    private static void createFile(String filename, String initialContent) {
+        BufferedWriter writer = null;
+
+        try {
+            // Create a new file with the specified name
+            File file = new File(filename);
+            if (file.createNewFile()) {
+                System.out.println("File created: " + filename);
+            } else {
+                System.err.println("Error: File already exists.");
+                return;
+            }
+
+            // Write initial content to the file if provided
+            if (initialContent != null && !initialContent.isEmpty()) {
+                writer = new BufferedWriter(new FileWriter(file));
+                writer.write(initialContent);
+            }
+        } catch (IOException e) {
+            // Handle IO error by logging the command and printing an error message
+            logErrorCommand("createfile " + filename);
+            System.err.println("Error creating file: " + filename);
+        } finally {
+            // Close the writer when done
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    // Ignored
+                }
+            }
+        }
+    }
+
+
 
 
     // Method to create and run a process
@@ -162,6 +197,13 @@ public class TestProcessBuilder {
             // If the command is "filedump," call the fileDump method with the filename parameter
             String filename = command.substring("filedump ".length());
             fileDump(filename);
+        }
+        else if (command.toLowerCase().startsWith("createfile ")) {
+            // If the command is "createfile," parse the filename and call the createFile method
+            String[] parts = command.split(" ", 3);
+            String filename = parts[1];
+            String initialContent = (parts.length > 2) ? parts[2] : "";
+            createFile(filename, initialContent);
         }
         else if (command.toLowerCase().startsWith("copyfile ")) {
             // If the command is "copyfile," parse the filenames and call the copyFile method

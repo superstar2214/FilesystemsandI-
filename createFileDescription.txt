@@ -1,0 +1,9 @@
+The `createfile` command is used for creating new files in the current working directory. The syntax for the command is as follows:
+`createfile <filename> [initialContent]`
+- `<filename>`: The name of the file to be created. It must be a valid file name and should not already exist in the directory.
+- `[initialContent]` (optional): The initial text content to be written into the newly created file.
+
+Example Usage:
+`createfile example.txt "This is initial content"`
+
+When executed, the `createfile` command will create a new file with the specified name and write the optional initial content into it. If a file with the same name already exists, an error message will be displayed.
